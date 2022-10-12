@@ -37,6 +37,13 @@ namespace cpplab
                 throw std::out_of_range("vector index out of bounds");
             return data[index];
         }
+        friend std::ostream &operator<<(std::ostream &os, const vector<T> &v)
+        {
+            for (int i = 0; i < v.size; ++i)
+                os << v[i] << " ";
+            return os;
+        }
+
         void push_back(T item)
         {
             if (size >= capacity)
