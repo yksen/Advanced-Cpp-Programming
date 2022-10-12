@@ -99,8 +99,17 @@ int main()
 
     for (int i = 0; i < 10; ++i)
         int_vector.push_back(i);
-    int_vector.resize(20, 0);
-    int_vector.print();
+    int_vector[5] = 999;
+    std::cout << int_vector << std::endl;
+
+    string_vector.resize(10, "Hello");
+    string_vector.resize(2, "");
+    string_vector.resize(5, "world");
+    std::cout << string_vector << std::endl;
+
+    cpplab::vector<int> a{1, 2, 3};
+    cpplab::vector<int> b{4, 5, 6, 7};
+    std::cout << a * b << std::endl;
 
     return 0;
 }
