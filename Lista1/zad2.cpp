@@ -37,6 +37,14 @@ namespace cpplab
                 throw std::out_of_range("vector index out of bounds");
             return data[index];
         }
+        double operator*(vector<T> const &rhs) const
+        {
+            double result = 0;
+            size_t min_size = size < rhs.size ? size : rhs.size;
+            for (size_t i = 0; i < min_size; i++)
+                result += data[i] * rhs[i];
+            return result;
+        }
         friend std::ostream &operator<<(std::ostream &os, const vector<T> &v)
         {
             for (int i = 0; i < v.size; ++i)
@@ -62,16 +70,9 @@ namespace cpplab
                 for (size_t i = size; i < new_size; ++i)
                     data[i] = value;
             else if (new_size > capacity)
-            {
-                reallocate();
                 for (size_t i = size; i < new_size; ++i)
                     this->push_back(value);
             size = new_size;
-        }
-        void print()
-        {
-            for (int i = 0; i < size; ++i)
-                std::cout << data[i] << "\n";
         }
 
     private:
