@@ -58,8 +58,7 @@ namespace cpplab
             {
                 reallocate();
                 for (size_t i = size; i < new_size; ++i)
-                    data[i] = value;
-            }
+                    this->push_back(value);
             size = new_size;
         }
         void print()
