@@ -8,10 +8,18 @@ namespace cpplab
     class vector
     {
     public:
+        typedef T value_type;
         vector()
         {
             capacity = 0;
             size = 0;
+        }
+        vector(std::initializer_list<T> list)
+        {
+            capacity = list.size();
+            size = list.size();
+            data = std::make_unique<T[]>(capacity);
+            std::copy(list.begin(), list.end(), data.get());
         }
         ~vector()
         {
@@ -19,7 +27,13 @@ namespace cpplab
         }
         T &operator[](size_t index)
         {
-            if (index >= size)
+            if (index < 0 || index >= size)
+                throw std::out_of_range("vector index out of bounds");
+            return data[index];
+        }
+        T operator[](size_t index) const
+        {
+            if (index < 0 || index >= size)
                 throw std::out_of_range("vector index out of bounds");
             return data[index];
         }
