@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <vector>
 
 namespace cpplab
 {
@@ -44,17 +45,6 @@ namespace cpplab
             return os;
         }
 
-        template <typename U>
-        auto operator*(vector<U> const &rhs)
-        {
-            if (size_ != rhs.size())
-                throw std::logic_error("dot product arguments have to be the same size");
-            decltype(data_[0] * rhs[0]) result = 0;
-            for (size_t i = 0; i < size_; i++)
-                result += data_[i] * rhs[i];
-            return result;
-        }
-
         void push_back(T item)
         {
             if (size_ >= capacity_)
@@ -91,7 +81,6 @@ namespace cpplab
             for (size_t i = 0; i < size_; ++i)
                 new_data[i] = data_[i];
             data_.reset(new_data);
-            delete [] new_data;
         }
 
         size_t size_;
@@ -99,6 +88,17 @@ namespace cpplab
         std::unique_ptr<T[]> data_;
     };
 }
+
+template <typename T, typename U>
+auto operator*(T const &lhs, U const &rhs)
+{
+    if (lhs.size() != rhs.size())
+        throw std::logic_error("dot product arguments have to be the same size");
+    decltype(lhs[0] * rhs[0]) result = 0;
+    for (size_t i = 0; i < lhs.size(); i++)
+        result += lhs[i] * rhs[i];
+    return result;
+        }
 
 int main()
 {
@@ -115,11 +115,13 @@ int main()
     string_vector.resize(5, "world");
     std::cout << string_vector << std::endl;
 
-    cpplab::vector<int> a{1, 3, 2};
-    cpplab::vector<int> b{4, 5, 6};
+    std::vector<int> a{4, 5, 6};
+    cpplab::vector<int> b{1, 3, 2};
     cpplab::vector<double> c{1.5, 1. / 3, 0.5};
     std::cout << a * b << std::endl;
-    std::cout << a * c << std::endl;
+    std::cout << c * b << std::endl;
+    std::cout << a * a << std::endl;
+    std::cout << b * b << std::endl;
 
     return 0;
 }
