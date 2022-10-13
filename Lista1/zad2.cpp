@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <numeric>
 #include <stdexcept>
 #include <vector>
 
@@ -71,6 +72,14 @@ namespace cpplab
         {
             return size_;
         }
+        T* begin() const
+        {
+            return &data_[0];
+        }
+        T* end() const
+        {
+            return &data_[size_];
+        }
 
     private:
         void reallocate()
@@ -94,11 +103,8 @@ auto operator*(T const &lhs, U const &rhs)
 {
     if (lhs.size() != rhs.size())
         throw std::logic_error("dot product arguments have to be the same size");
-    decltype(lhs[0] * rhs[0]) result = 0;
-    for (size_t i = 0; i < lhs.size(); i++)
-        result += lhs[i] * rhs[i];
-    return result;
-        }
+    return std::inner_product(lhs.begin(), lhs.end(), rhs.begin(), 0.);
+}
 
 int main()
 {
@@ -122,6 +128,8 @@ int main()
     std::cout << c * b << std::endl;
     std::cout << a * a << std::endl;
     std::cout << b * b << std::endl;
+    std::cout << std::string("a") * std::string("a") << std::endl;
+    std::cout << string_vector * string_vector << std::endl;
 
     return 0;
 }
