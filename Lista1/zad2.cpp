@@ -47,9 +47,10 @@ namespace cpplab
         template <typename U>
         auto operator*(vector<U> const &rhs)
         {
-            size_t min_size = size_ < rhs.size() ? size_ : rhs.size();
+            if (size_ != rhs.size())
+                throw std::logic_error("dot product arguments have to be the same size");
             decltype(data_[0] * rhs[0]) result = 0;
-            for (size_t i = 0; i < min_size; i++)
+            for (size_t i = 0; i < size_; i++)
                 result += data_[i] * rhs[i];
             return result;
         }
@@ -85,11 +86,12 @@ namespace cpplab
         void reallocate()
         {
             size_t new_capacity = (capacity_ == 0) ? 1 : 2 * capacity_;
+            capacity_ = new_capacity;
             T *new_data = new T[new_capacity];
             for (size_t i = 0; i < size_; ++i)
                 new_data[i] = data_[i];
             data_.reset(new_data);
-            capacity_ = new_capacity;
+            delete [] new_data;
         }
 
         size_t size_;
@@ -114,7 +116,7 @@ int main()
     std::cout << string_vector << std::endl;
 
     cpplab::vector<int> a{1, 3, 2};
-    cpplab::vector<int> b{4, 5, 6, 7};
+    cpplab::vector<int> b{4, 5, 6};
     cpplab::vector<double> c{1.5, 1. / 3, 0.5};
     std::cout << a * b << std::endl;
     std::cout << a * c << std::endl;
