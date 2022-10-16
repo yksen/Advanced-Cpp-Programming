@@ -72,11 +72,11 @@ namespace cpplab
         {
             return size_;
         }
-        T* begin() const
+        T *begin() const
         {
             return &data_[0];
         }
-        T* end() const
+        T *end() const
         {
             return &data_[size_];
         }
@@ -99,7 +99,7 @@ namespace cpplab
 }
 
 template <typename T, typename U>
-auto operator*(T const &lhs, U const &rhs)
+auto operator*(T const &lhs, U const &rhs) -> decltype(lhs[0] * rhs[0])
 {
     if (lhs.size() != rhs.size())
         throw std::logic_error("dot product arguments have to be the same size");
