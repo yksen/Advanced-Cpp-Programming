@@ -30,6 +30,10 @@ int main()
     constexpr cpplab::Hypercube<double> b(0, 3.14);
     constexpr cpplab::Hypercube<float> c(-1, 2.71);
 
+    static_assert(a.get_volume() == 16, "Assertion failed");
+    static_assert(b.get_volume() == 0, "Assertion failed");
+    static_assert(c.get_volume() == -1, "Assertion failed");
+
     std::cout << a.get_volume() << std::endl;
     std::cout << b.get_volume() << std::endl;
     std::cout << c.get_volume() << std::endl;
