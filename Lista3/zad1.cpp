@@ -26,12 +26,24 @@ namespace cpplab
         {
             data_.release();
         }
-        vector(const vector& other)
+        vector(const vector &other)
         {
             capacity_ = other.capacity_;
             size_ = other.size_;
             data_ = std::make_unique<T[]>(capacity_);
             std::copy(other.data_.get(), other.data_.get() + size_, data_.get());
+        }
+
+        vector &operator=(const vector &other)
+        {
+            if (this != &other)
+            {
+                capacity_ = other.capacity_;
+                size_ = other.size_;
+                data_ = std::make_unique<T[]>(capacity_);
+                std::copy(other.data_.get(), other.data_.get() + size_, data_.get());
+            }
+            return *this;
         }
         T &operator[](size_t index)
         {
@@ -114,9 +126,13 @@ auto operator*(T const &lhs, U const &rhs) -> decltype(lhs[0] * rhs[0])
 
 int main()
 {
-    cpplab::vector<int> a{1, 2};
+    cpplab::vector<int> a{1, 2, 3};
     cpplab::vector<int> b(a);
     std::cout << b << std::endl;
+
+    cpplab::vector<int> c;
+    c = a;
+    std::cout << c << std::endl;
 
     return 0;
 }
