@@ -12,107 +12,108 @@ namespace cpplab
         typedef T value_type;
         vector()
         {
-            capacity_ = 0;
-            size_ = 0;
+            _capacity = 0;
+            _size = 0;
         }
         vector(std::initializer_list<T> list)
         {
-            capacity_ = list.size();
-            size_ = list.size();
-            data_ = std::make_unique<T[]>(capacity_);
-            std::copy(list.begin(), list.end(), data_.get());
+            _capacity = list.size();
+            _size = list.size();
+            _data = std::make_unique<T[]>(_capacity);
+            std::copy(list.begin(), list.end(), _data.get());
         }
         ~vector()
         {
-            data_.release();
+            _data.release();
+            std::cout << "destructor" << std::endl;
         }
         vector(const vector &other)
         {
-            capacity_ = other.capacity_;
-            size_ = other.size_;
-            data_ = std::make_unique<T[]>(capacity_);
-            std::copy(other.data_.get(), other.data_.get() + size_, data_.get());
+            _capacity = other._capacity;
+            _size = other._size;
+            _data = std::make_unique<T[]>(_capacity);
+            std::copy(other._data.get(), other._data.get() + _size, _data.get());
+            std::cout << "copy constructor" << std::endl;
         }
-
         vector &operator=(const vector &other)
         {
             if (this != &other)
             {
-                capacity_ = other.capacity_;
-                size_ = other.size_;
-                data_ = std::make_unique<T[]>(capacity_);
-                std::copy(other.data_.get(), other.data_.get() + size_, data_.get());
+                _capacity = other._capacity;
+                _size = other._size;
+                _data = std::make_unique<T[]>(_capacity);
+                std::copy(other._data.get(), other._data.get() + _size, _data.get());
             }
             return *this;
         }
         T &operator[](size_t index)
         {
-            if (index < 0 || index >= size_)
+            if (index < 0 || index >= _size)
                 throw std::out_of_range("vector index out of bounds");
-            return data_[index];
+            return _data[index];
         }
         T operator[](size_t index) const
         {
-            if (index < 0 || index >= size_)
+            if (index < 0 || index >= _size)
                 throw std::out_of_range("vector index out of bounds");
-            return data_[index];
+            return _data[index];
         }
         friend std::ostream &operator<<(std::ostream &os, const vector<T> &v)
         {
-            for (size_t i = 0; i < v.size_; ++i)
+            for (size_t i = 0; i < v._size; ++i)
                 os << v[i] << " ";
             return os;
         }
 
         void push_back(T item)
         {
-            if (size_ >= capacity_)
+            if (_size >= _capacity)
                 reallocate();
-            data_[size_] = item;
-            ++size_;
+            _data[_size] = item;
+            ++_size;
         }
         void pop_back()
         {
-            if (size_ > 0)
-                --size_;
+            if (_size > 0)
+                --_size;
         }
         void resize(size_t new_size, T value)
         {
-            if (new_size > size_ && new_size <= capacity_)
-                for (size_t i = size_; i < new_size; ++i)
-                    data_[i] = value;
-            else if (new_size > capacity_)
-                for (size_t i = size_; i < new_size; ++i)
+            if (new_size > _size && new_size <= _capacity)
+                for (size_t i = _size; i < new_size; ++i)
+                    _data[i] = value;
+            else if (new_size > _capacity)
+                for (size_t i = _size; i < new_size; ++i)
                     this->push_back(value);
-            size_ = new_size;
+            _size = new_size;
         }
         size_t size() const
         {
-            return size_;
+            return _size;
         }
         T *begin() const
         {
-            return &data_[0];
+            return &_data[0];
         }
         T *end() const
         {
-            return &data_[size_];
+            return &_data[_size];
         }
 
     private:
         void reallocate()
         {
-            size_t new_capacity = (capacity_ == 0) ? 1 : 2 * capacity_;
-            capacity_ = new_capacity;
+            size_t new_capacity = (_capacity == 0) ? 1 : 2 * _capacity;
+            _capacity = new_capacity;
             T *new_data = new T[new_capacity];
-            for (size_t i = 0; i < size_; ++i)
-                new_data[i] = data_[i];
-            data_.reset(new_data);
+            for (size_t i = 0; i < _size; ++i)
+                new_data[i] = _data[i];
+            _data.reset(new_data);
         }
 
-        size_t size_;
-        size_t capacity_;
-        std::unique_ptr<T[]> data_;
+        size_t _size;
+        size_t _capacity;
+        std::unique_ptr<T[]> _data;
     };
 }
 
