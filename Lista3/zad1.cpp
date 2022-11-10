@@ -25,7 +25,6 @@ namespace cpplab
         ~vector()
         {
             _data.release();
-            std::cout << "destructor" << std::endl;
         }
         vector(const vector &other)
         {
@@ -34,6 +33,11 @@ namespace cpplab
             _data = std::make_unique<T[]>(_capacity);
             std::copy(other._data.get(), other._data.get() + _size, _data.get());
             std::cout << "copy constructor" << std::endl;
+        }
+        vector(vector &&other) noexcept
+        {
+            *this = std::move(other);
+            std::cout << "move constructor" << std::endl;
         }
         vector &operator=(const vector &other)
         {
@@ -44,6 +48,22 @@ namespace cpplab
                 _data = std::make_unique<T[]>(_capacity);
                 std::copy(other._data.get(), other._data.get() + _size, _data.get());
             }
+            std::cout << "copy assignment" << std::endl;
+            return *this;
+        }
+        vector &operator=(vector &&other) noexcept
+        {
+            if (this != &other)
+            {
+                _capacity = other._capacity;
+                _size = other._size;
+                _data = std::move(other._data);
+
+                other._capacity = 0;
+                other._size = 0;
+                other._data.release();
+            }
+            std::cout << "move assignment" << std::endl;
             return *this;
         }
         T &operator[](size_t index)
@@ -134,6 +154,13 @@ int main()
     cpplab::vector<int> c;
     c = a;
     std::cout << c << std::endl;
+
+    cpplab::vector<int> d(std::move(c));
+    std::cout << d << std::endl;
+
+    cpplab::vector<int> e;
+    e = std::move(d);
+    std::cout << e << std::endl;
 
     return 0;
 }
