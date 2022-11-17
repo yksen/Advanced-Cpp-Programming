@@ -87,11 +87,12 @@ namespace cpplab
         }
 
         template <typename... Ts>
-        void emplace_back(T &&head, Ts &&...tail)
+        void emplace_back(Ts &&...args)
         {
-            push_back(std::forward<T>(head));
-            if constexpr (sizeof...(tail) > 0)
-                emplace_back(std::forward<Ts>(tail)...);
+            if (_size >= _capacity)
+                reallocate();
+            _data[_size] = T(std::forward<Ts>(args)...);
+            ++_size;
         }
         void push_back(T value)
         {
