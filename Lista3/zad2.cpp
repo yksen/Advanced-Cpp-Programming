@@ -33,8 +33,12 @@ int main()
 {
     cpplab::vector<Pixel> a;
 
+    std::cout << "push_back" << std::endl;
+    Pixel p(7, 8, 9);
+    a.push_back(p);
+    
+    std::cout << std::endl << "emplace_back" << std::endl;
     a.emplace_back(1, 2, 3);
-    a.emplace_back(4, 5, 6);
 
     return 0;
 }
