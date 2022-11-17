@@ -86,11 +86,18 @@ namespace cpplab
             return os;
         }
 
-        void push_back(T item)
+        template <typename... Ts>
+        void emplace_back(T &&head, Ts &&...tail)
+        {
+            push_back(std::forward<T>(head));
+            if constexpr (sizeof...(tail) > 0)
+                emplace_back(std::forward<Ts>(tail)...);
+        }
+        void push_back(T value)
         {
             if (_size >= _capacity)
                 reallocate();
-            _data[_size] = item;
+            _data[_size] = value;
             ++_size;
         }
         void pop_back()
@@ -108,6 +115,7 @@ namespace cpplab
                     this->push_back(value);
             _size = new_size;
         }
+
         size_t size() const
         {
             return _size;
