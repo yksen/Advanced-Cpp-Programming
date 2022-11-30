@@ -4,9 +4,9 @@
 
 int main() 
 {
-    const long long N = 1'000'000'000'000; 
+    const long long N = 1'000'000'000; 
     long long int i = 0; 
-    double sum = 0; 
+    double sum = 0.0; 
     clock_t t0 = clock();
     float start_time = omp_get_wtime();
     
