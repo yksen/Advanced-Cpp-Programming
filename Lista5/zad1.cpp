@@ -5,6 +5,8 @@
 
 size_t generateThreadId()
 {
+    static std::mutex mutex;
+    const std::lock_guard<std::mutex> lock(mutex);
     static size_t id = 0;
     thread_local size_t thread_id = id++;
     return thread_id;
