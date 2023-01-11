@@ -9,7 +9,9 @@ namespace cpplab
 {
     class ThreadPool
     {
-        std::vector<std::function<double()>> tasks;
+        std::vector<std::thread> threads;
+        size_t tasksFinished;
+        double sumOfResults{0};
 
         void add_task(std::function<double()> task)
         {
@@ -17,6 +19,7 @@ namespace cpplab
 
         double average()
         {
+            return sumOfResults / tasksFinished;
         }
 
         void stop()
