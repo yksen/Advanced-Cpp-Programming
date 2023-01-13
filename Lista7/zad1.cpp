@@ -3,6 +3,7 @@
 #include <future>
 #include <iostream>
 #include <thread>
+#include <queue>
 #include <vector>
 
 namespace cpplab
@@ -10,10 +11,6 @@ namespace cpplab
     class ThreadPool
     {
     public:
-        std::vector<std::thread> threads;
-        size_t tasksFinished{0};
-        double sumOfResults{0};
-
         ThreadPool(size_t threadCount)
         {
             start(threadCount);
@@ -26,6 +23,10 @@ namespace cpplab
 
         void add_task(std::function<double()> task)
         {
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                tasks.emplace(task);
+            }
         }
 
         double average()
@@ -40,9 +41,14 @@ namespace cpplab
                 threads.emplace_back(std::thread());
         }
 
-        void stop()
-        {
-        }
+    private:
+        std::vector<std::thread> threads;
+        std::queue<std::function<double()>> tasks;
+        std::mutex mutex;
+        std::condition_variable condition;
+        size_t tasksFinished{0};
+        double sumOfResults{0};
+        bool stopProcessing{false};
     };
 };
 
