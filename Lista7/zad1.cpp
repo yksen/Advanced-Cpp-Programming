@@ -13,12 +13,27 @@ namespace cpplab
     public:
         ThreadPool(size_t threadCount)
         {
-            start(threadCount);
+            for (size_t i = 0; i < threadCount; ++i)
+                threads.emplace_back([this] {
+                    while (true)
+                    {
+                        std::function<double()> task;
+                        {
+                            std::unique_lock<std::mutex> lock(mutex);
+                            condition.wait(lock, [this] { return stopProcessing || !tasks.empty(); });
+                            if (stopProcessing && tasks.empty())
+                                return;
+                            task = std::move(tasks.front());
+                            tasks.pop();
         }
-
-        ~ThreadPool()
+                        double result = task();
         {
-            stop();
+                            std::unique_lock<std::mutex> lock(mutex);
+                            ++tasksFinished;
+                            sumOfResults += result;
+                        }
+                    }
+                });
         }
 
         void add_task(std::function<double()> task)
@@ -27,6 +42,7 @@ namespace cpplab
                 std::unique_lock<std::mutex> lock(mutex);
                 tasks.emplace(task);
             }
+            condition.notify_one();
         }
 
         double average()
@@ -34,11 +50,15 @@ namespace cpplab
             return (tasksFinished == 0) ? 0 : sumOfResults / static_cast<double>(tasksFinished);
         }
 
-    private:
-        void start(size_t threadCount)
+        void stop()
         {
-            for (size_t i = 0; i < threadCount; ++i)
-                threads.emplace_back(std::thread());
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                stopProcessing = true;
+            }
+            condition.notify_all();
+            for (std::thread &thread : threads)
+                thread.join();
         }
 
     private:
