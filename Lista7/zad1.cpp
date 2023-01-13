@@ -25,9 +25,9 @@ namespace cpplab
                                 return;
                             task = std::move(tasks.front());
                             tasks.pop();
-        }
+                        }
                         double result = task();
-        {
+                        {
                             std::unique_lock<std::mutex> lock(mutex);
                             ++tasksFinished;
                             sumOfResults += result;
@@ -75,4 +75,11 @@ namespace cpplab
 int main()
 {
     cpplab::ThreadPool pool(10);
+
+    for (size_t i = 0; i <= 1'000'000; ++i)
+        pool.add_task([i] { return i; });
+
+    std::cout << "Average: " << pool.average() << std::endl;
+    pool.stop();
+    std::cout << "Average: " << pool.average() << std::endl;
 }
