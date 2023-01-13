@@ -31,7 +31,7 @@ namespace cpplab
 
         double average()
         {
-            return sumOfResults / tasksFinished;
+            return (tasksFinished == 0) ? 0 : sumOfResults / static_cast<double>(tasksFinished);
         }
 
     private:
