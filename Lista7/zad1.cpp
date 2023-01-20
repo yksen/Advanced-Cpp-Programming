@@ -15,23 +15,26 @@ namespace cpplab
         {
             for (size_t i = 0; i < threadCount; ++i)
                 threads.emplace_back([this] {
-                    while (true)
+                    while (waitingForTasks)
                     {
                         std::function<double()> task;
                         {
                             std::unique_lock<std::mutex> lock(mutex);
                             condition.wait(lock, [this] { return stopProcessing || !tasks.empty(); });
-                            if (stopProcessing && tasks.empty())
-                                return;
                             task = std::move(tasks.front());
                             tasks.pop();
                         }
-                        double result = task();
+                        if (task)
                         {
-                            std::unique_lock<std::mutex> lock(mutex);
-                            ++tasksFinished;
-                            sumOfResults += result;
+                            double result = task();
+                            {
+                                std::unique_lock<std::mutex> lock(mutex);
+                                ++tasksFinished;
+                                sumOfResults += result;
+                            }
                         }
+                        else
+                            waitingForTasks = false;         
                     }
                 });
         }
@@ -69,12 +72,13 @@ namespace cpplab
         size_t tasksFinished{0};
         double sumOfResults{0};
         bool stopProcessing{false};
+        bool waitingForTasks{true};
     };
 };
 
 int main()
 {
-    cpplab::ThreadPool pool(10);
+    cpplab::ThreadPool pool{4};
 
     for (size_t i = 0; i <= 1'000'000; ++i)
         pool.add_task([i] { return i; });
