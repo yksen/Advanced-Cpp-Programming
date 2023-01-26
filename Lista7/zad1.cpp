@@ -21,8 +21,11 @@ namespace cpplab
                         {
                             std::unique_lock<std::mutex> lock(mutex);
                             condition.wait(lock, [this] { return stopProcessing || !tasks.empty(); });
-                            task = std::move(tasks.front());
-                            tasks.pop();
+                            if (!tasks.empty())
+                            {
+                                task = std::move(tasks.front());
+                                tasks.pop();
+                            }
                         }
                         if (task)
                         {
@@ -37,6 +40,11 @@ namespace cpplab
                             waitingForTasks = false;         
                     }
                 });
+        }
+
+        ~ThreadPool()
+        {
+            this->stop();
         }
 
         void add_task(std::function<double()> task)
@@ -61,7 +69,8 @@ namespace cpplab
             }
             condition.notify_all();
             for (std::thread &thread : threads)
-                thread.join();
+                if (thread.joinable())
+                    thread.join();
         }
 
     private:
