@@ -61,7 +61,13 @@ namespace cpplab
             }
             condition.notify_all();
             for (std::thread &thread : threads)
-                thread.join();
+                if (thread.joinable())
+                    thread.join();
+        }
+
+        ~ThreadPool()
+        {
+            this->stop();
         }
 
     private:
