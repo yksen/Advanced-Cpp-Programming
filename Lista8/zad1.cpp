@@ -26,6 +26,11 @@ namespace cpplab
         Engine(uint32_t fuelConsumption, uint32_t refuelInterval)
             : fuelConsumption(fuelConsumption), refuelInterval(refuelInterval) {}
 
+        void addFuelTank(std::shared_ptr<FuelTank> fuelTank)
+        {
+            fuelTanks.push_back(fuelTank);
+        }
+
     private:
         uint32_t fuelConsumption;
         std::chrono::seconds refuelInterval;
