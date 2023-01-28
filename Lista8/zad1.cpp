@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <memory>
@@ -38,6 +39,7 @@ namespace cpplab
                     for (auto fuelTank = fuelTanks.begin(); fuelTank != fuelTanks.end();)
                     {
                         auto fuel = (*fuelTank)->refuel(fuelConsumption);
+                        fuelUsed += fuel;
                         if (fuel == 0)
                             fuelTanks.erase(fuelTank);
                         else
@@ -50,6 +52,8 @@ namespace cpplab
         ~Engine()
         {
             refuelThread.join();
+            std::chrono::duration<double> elapsedSeconds = std::chrono::system_clock::now() - startTime;
+            std::cout << "Fuel used: " << fuelUsed << "\tElapsed time: " << elapsedSeconds.count() << std::endl;
         }
 
         void addFuelTank(std::shared_ptr<FuelTank> fuelTank)
@@ -62,9 +66,25 @@ namespace cpplab
         std::vector<std::shared_ptr<FuelTank>> fuelTanks;
         std::thread refuelThread;
         std::mutex mutex;
+        uint32_t fuelUsed{0};
+        std::chrono::time_point<std::chrono::system_clock> startTime{std::chrono::system_clock::now()};
     };
 }
 
 int main()
 {
+    std::vector<std::shared_ptr<cpplab::Engine>> engines{
+        std::make_shared<cpplab::Engine>(1, std::chrono::seconds(1)),
+        std::make_shared<cpplab::Engine>(5, std::chrono::seconds(2)),
+        std::make_shared<cpplab::Engine>(2, std::chrono::seconds(3))
+    };
+
+    std::vector<std::shared_ptr<cpplab::FuelTank>> fuelTanks;
+    std::generate_n(std::back_inserter(fuelTanks), 3, [] { return std::make_shared<cpplab::FuelTank>(10); });
+    std::generate_n(std::back_inserter(fuelTanks), 4, [] { return std::make_shared<cpplab::FuelTank>(15); });
+    std::generate_n(std::back_inserter(fuelTanks), 4, [] { return std::make_shared<cpplab::FuelTank>(20); });
+
+    for (auto &engine : engines)
+        for (auto &fuelTank : fuelTanks)
+            engine->addFuelTank(fuelTank);
 }
