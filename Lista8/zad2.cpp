@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace cpplab
@@ -10,18 +11,11 @@ namespace cpplab
     {
     public:
         unique_ptr() : pointer(nullptr) {}
-        unique_ptr(T value) : pointer(new T(value)) {}
-        unique_ptr(T *pointer)
-        {
-            if (pointer != nullptr)
-                pointer = new T(*pointer);
-            else
-                pointer = nullptr;
-        }
+        unique_ptr(T *pointer) : pointer(pointer) {}
         unique_ptr(const unique_ptr &) = delete;
         unique_ptr &operator=(const unique_ptr &) = delete;
-        unique_ptr(unique_ptr&& other) noexcept : pointer(std::exchange(other.pointer, nullptr)) {}
-        unique_ptr& operator=(unique_ptr&& other) noexcept
+        unique_ptr(unique_ptr &&other) noexcept : pointer(std::exchange(other.pointer, nullptr)) {}
+        unique_ptr &operator=(unique_ptr &&other) noexcept
         {
             std::swap(pointer, other.pointer);
             return *this;
@@ -55,10 +49,10 @@ namespace cpplab
     class non0_ptr : public unique_ptr<T>
     {
     public:
-        non0_ptr(T value) : unique_ptr<T>(value) {}
         non0_ptr(T *pointer) : unique_ptr<T>(pointer)
         {
-            static_assert(pointer != nullptr, "cpplab::non0_ptr cannot be initialized with nullptr");
+            if (pointer == nullptr)
+                throw std::invalid_argument("cpplab::non0_ptr cannot be initialized with nullptr");
         }
 
         void release() = delete;
@@ -67,4 +61,13 @@ namespace cpplab
 
 int main()
 {
+    cpplab::unique_ptr<int> p1(new int(2));
+    std::cout << *p1 << std::endl;
+
+    p1 = cpplab::unique_ptr<int>(new int(4));
+    std::cout << *p1 << std::endl;
+
+    cpplab::unique_ptr<int> p2(std::move(p1));
+    std::cout << p1.get() << std::endl;
+    std::cout << *p2 << std::endl;
 }
