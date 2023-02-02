@@ -70,4 +70,16 @@ int main()
     cpplab::unique_ptr<int> p2(std::move(p1));
     std::cout << p1.get() << std::endl;
     std::cout << *p2 << std::endl;
+
+    cpplab::non0_ptr<double> np1(new double(2.5));
+    std::cout << *np1 << std::endl;
+
+    try
+    {
+        cpplab::non0_ptr<double> np2(nullptr);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
 }
